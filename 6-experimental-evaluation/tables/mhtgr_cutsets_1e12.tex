@@ -1,0 +1,27 @@
+\begin{table}[]
+\centering
+\caption{Total number of cut sets and execution times per event tree for SAPHSOLVE and SCRAM at a truncation limit of $10^{-12}$.}
+\label{tab:mhtgr_cutsets_1e12}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Event tree} &
+\shortstack{\textbf{SAPHSOLVE}\\\textbf{cut sets}} &
+\shortstack{\textbf{SCRAM}\\\textbf{cut sets}} &
+\shortstack{\textbf{SAPHSOLVE}\\\textbf{MCUB (s)}} &
+\shortstack{\textbf{SCRAM}\\\textbf{MCUB (s)}} &
+\shortstack{\textbf{SCRAM}\\\textbf{REA (s)}} \\
+\midrule
+SGTL-S & 6,599     & 6,599     & 0.725   & 0.285   & 0.289   \\
+PCL    & 1,429,807 & 1,429,807 & 110.828 & 186.307 & 186.658 \\
+ATRS   & 2,387,281 & 2,387,281 & 183.113 & 24.967  & 24.986  \\
+CRW    & 114,249   & 114,249   & 9.023   & 0.938   & 1.703   \\
+LOOP   & 2,473     & 2,473     & 0.362   & 0.367   & 0.369   \\
+SGTL-M & 10,705    & 10,705    & 0.491   & 0.187   & 0.193   \\
+LOHTL  & 16,130    & 16,130    & 0.951   & 20.847  & 20.885  \\
+\midrule
+Total  & 3,967,244 & 3,967,244 & 305.494 & 233.899 & 235.084 \\
+\bottomrule
+\end{tabular}
+\end{table}

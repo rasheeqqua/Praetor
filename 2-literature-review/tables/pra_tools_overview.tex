@@ -1,0 +1,160 @@
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash\hsize=#1\hsize}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash\hsize=#1\hsize}X}
+\begin{landscape}
+\begin{table}
+\centering
+\begin{threeparttable}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\caption{Feature overview of reviewed \acrshort{pra} tools.}
+\label{tab:pra_tools_overview}
+
+\begin{tabularx}{\textwidth}{@{} L{1.20} L{1.30} L{0.60} L{1.55} L{0.85} C{0.50} @{}}
+\toprule
+\textbf{Tool} &
+\textbf{Platform/OS} &
+\textbf{User} &
+\textbf{Model Exchange Format} &
+\textbf{License} &
+\textbf{Processing Mode} \\
+\midrule
+
+\acrshort{saphire} &
+Desktop/Windows &
+Single &
+MAR-D + JSInp &
+Proprietary &
+S \\
+
+Phoenix Architect &
+Desktop/Windows &
+Multi\tnote{*} &
+.CAF, .ETA, .RR, .CUT, .RAW + MAR-D + OpenPSA + SETS &
+Commercial proprietary &
+S/P/D\tnote{$\dagger$} \\
+
+CAFTA &
+Desktop/Windows &
+Multi\tnote{*} &
+.CAF, .ETA, .RR, .CUT, .RAW + SETS + FTAP &
+Commercial proprietary &
+S \\
+
+\acrshort{ftrex} &
+Desktop/Windows &
+Single &
+FTAP/.FTP + KIRAP/.KIR + .RAW, .CUT, .TXT + MAR-D &
+Commercial proprietary &
+P \\
+
+ZEBRA &
+Solver engine/OS n/s &
+Single &
+Unspecified &
+Unspecified &
+S/P \\
+
+XFTA &
+Desktop/Cross platform &
+Single &
+OpenPSA + S2ML+SBE + TSV &
+Freeware proprietary &
+S \\
+
+RiskSpectrum &
+Desktop/Windows + client-server &
+Single\tnote{*} &
+Unspecified &
+Commercial proprietary &
+S \\
+
+RISKMAN &
+Desktop/Windows &
+Single &
+CAFTA + FTREX + SAPHIRE &
+Commercial proprietary &
+S \\
+
+ASTRA &
+Desktop/Windows &
+Single &
+OpenPSA + .tfx, .adf &
+Proprietary &
+S \\
+
+RiskA &
+Desktop/Windows + client-server &
+Multi &
+XML + OpenPSA + CAFTA and RiskSpectrum formats + Rich text + Excel, text, Word &
+Proprietary &
+S \\
+
+DeRisk &
+Desktop/OS n/s &
+Single &
+Unspecified &
+Proprietary &
+S \\
+
+Trilith &
+Desktop/Windows &
+Single &
+XML export &
+Commercial proprietary &
+S \\
+
+\acrshort{hcla} &
+CLI/Cross platform + client-server &
+Multi &
+JSON &
+Proprietary &
+S \\
+
+OpenPRA &
+Client-server &
+Multi &
+OpenPSA + OpenPRA JSON &
+MIT + GPLv3 &
+D \\
+
+SCRAM &
+Desktop/Cross platform + Solver engine &
+Single &
+OpenPSA + SVG &
+GPLv3 &
+S \\
+
+SCRAM-cpp &
+Solver engine/Cross platform &
+Single &
+OpenPSA &
+GPLv3 &
+P \\
+
+SCRAM++ &
+Solver engine/Cross platform &
+Single &
+OpenPSA &
+Proprietary &
+S \\
+
+mcSCRAM &
+Solver engine/Cross platform &
+Single &
+OpenPSA &
+AGPLv3 &
+P \\
+
+\bottomrule
+\end{tabularx}
+
+\begin{tablenotes}
+  \item[*] ``Multi-user'' here refers to built-in support for team workflows (e.g., repositories or web access), not necessarily simultaneous editing of the same model without coordination.
+  \item[$\dagger$] Phoenix Architect documentation mentions remote quantification options. Public sources do not describe full scheduling and fault tolerance semantics.
+  \item[] Processing types: S = serial; P = parallel on a single machine (shared memory / GPU); D = distributed execution across multiple machines.
+  \item[] n/s = not specified clearly in the reviewed public documentation.
+\end{tablenotes}
+
+\end{threeparttable}
+\end{table}
+\end{landscape}

@@ -1,0 +1,41 @@
+\begin{landscape}
+\begin{longtable}{@{}lll@{}}
+\caption{Main entrypoints exposed by the API gateway.}
+\label{tab:endpoints}\\
+\toprule
+\textbf{Endpoint} & \textbf{Methods} & \textbf{Description} \\
+\midrule
+\endfirsthead
+\caption*{Table \thetable{} (continued).}\\
+\toprule
+\textbf{Endpoint} & \textbf{Methods} & \textbf{Description} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+%
+\multicolumn{3}{@{}l}{\textbf{Executable Solver Submission}}\\
+\midrule
+\texttt{/q/execute/scram} & POST & Submit an executable based SCRAM quantification job \\
+\texttt{/q/execute/ftrex} & POST & Submit an FTREX executable quantification job \\
+\texttt{/q/execute/xfta} & POST & Submit an XFTA executable quantification job \\
+\texttt{/q/execute/saphsolve} & POST & Submit a SAPHSOLVE executable quantification job \\
+\texttt{/q/execute/<tool>?distributedSequences=true} & POST & Submit an executable task using event tree decomposition \\
+\addlinespace
+\multicolumn{3}{@{}l}{\textbf{Direct JSON Quantification}}\\
+\midrule
+\texttt{/q/quantify/scram} & POST & Submit a direct JSON based SCRAM quantification job \\
+\texttt{/q/quantify/praxis} & POST & Submit a direct JSON based PRAXIS quantification job \\
+\texttt{/q/quantify/adaptive} & POST & Submit adaptive quantification with convergence criteria \\
+\texttt{/q/quantify/<tool>?distributedSequences=true} & POST & Submit a quantification job using event tree decomposition \\
+\addlinespace
+\multicolumn{3}{@{}l}{\textbf{Job Retrieval and Monitoring}}\\
+\midrule
+\texttt{/execute/results/\{job\_id\}} & GET & Retrieve results for an executable based job \\
+\texttt{/quantify/results/\{job\_id\}} & GET & Retrieve results for a direct quantification job \\
+\texttt{/execute/status/\{job\_id\}} & GET & Retrieve status for an executable based job \\
+\texttt{/quantify/status/\{job\_id\}} & GET & Retrieve status for a direct quantification job \\
+\texttt{/execute/input/\{job\_id\}} & GET & Retrieve the submitted input for an executable based job \\
+\texttt{/quantify/input/\{job\_id\}} & GET & Retrieve the submitted input for a direct quantification job \\
+\end{longtable}
+\end{landscape}

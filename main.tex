@@ -1,0 +1,106 @@
+\documentclass[12pt,
+               phd,
+               doublespacing
+               ]{ncsuthesis}
+
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{multirow}
+\usepackage{siunitx}
+\usepackage{tabularx}
+\usepackage{ragged2e}
+\usepackage{rotating}
+\usepackage{graphicx}
+\usepackage{pdflscape}
+\usepackage{array}
+\usepackage{threeparttable}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{lipsum}
+%\usepackage{natbib}
+\usepackage{glossaries}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{fit}
+\usetikzlibrary{shadows}
+\usepackage[backend=biber]{biblatex}
+\usepackage{float}
+\usepackage[inkscapelatex=false]{svg}
+
+\newacronym{pra}{PRA}{Probabilistic Risk Assessment}
+\newacronym{mcs}{MCS}{Minimal Cut Sets}
+\newacronym{mocus}{MOCUS}{Method of Obtaining Cut Sets}
+\newacronym{bdd}{BDD}{Binary Decision Diagram}
+\newacronym{obdd}{OBDD}{Ordered BDD}
+\newacronym{lbdd}{L-BDD}{Labelled-BDD}
+\newacronym{hpc}{HPC}{High Performance Computing}
+\newacronym{saphire}{SAPHIRE}{Systems Analysis Programs for Hands-on Integrated Reliability Evaluations}
+\newacronym{hra}{HRA}{Human Reliability Analysis}
+\newacronym{qras}{QRAS}{the Quantitative Risk Assessment System}
+\newacronym{ftrex}{FTREX}{Fault Tree Reliability Evaluation eXpert}
+\newacronym{hcla}{HCLA}{Hybrid Causal Logic Analyzer}
+\newacronym{kirap}{KIRAP}{}
+\newacronym{ducg}{DUCG}{Dynamic Uncertain Causality Graphs}
+\newacronym{ft}{FT}{fault tree}
+\newacronym{et}{ET}{event tree}
+
+
+%\bibpunct{(}{)}{;}{a}{}{,}
+
+\dispositionformat{\bfseries}
+
+\headingformat{\large\MakeUppercase}
+
+\frenchspacing
+
+\include{optional}
+
+%\setlength{\headheight}{26.94345pt}
+%\fancyhead[L]{\vspace{1mm}}
+\committeesize{3}
+
+\chair{Dr. Mihai A. Diaconeasa}
+\memberI{Dr. Maria Avramova}
+\memberII{Dr. Nam T. Dinh}
+%\memberIII{}
+
+\student{Hasibul Hossain}{Rasheeq}
+
+\program{Nuclear Engineering}
+
+\thesistitle{Design and Implementation of a Distributed Networked System for PRA Quantification}
+
+\newcommand{\uv}[1]{\ensuremath{\mathbf{\hat{#1}}}}
+\newcommand{\bo}{\ensuremath{\mathbf{\Omega}}}
+\newcommand{\eref}[1]{Eq.~\ref{#1}}
+\newcommand{\fref}[1]{Fig.~\ref{#1}}
+\newcommand{\tref}[1]{Table~\ref{#1}}
+\addbibresource{bibliography.bib}
+\begin{document}
+\frontmatter
+\include{front}
+\mainmatter
+\include{1-introduction/_}
+\include{2-literature-review/_}
+\include{3-theory-and-practice/_}
+\include{4-design/_}
+\include{5-implementation/_}
+\include{6-experimental-evaluation/_}
+%\include{7-discussion/_}
+\include{8-conclusion-and-future-work/_}
+\printbibliography[
+heading=bibintoc,
+title={References}
+]
+%%\bibliography{bibliography}
+%%\bibliographystyle{ieeetr}
+
+\restoregeometry
+\appendix
+\include{appendix/_}
+\restoregeometry
+\backmatter
+
+\end{document}

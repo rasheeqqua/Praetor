@@ -1,0 +1,100 @@
+\chapter{Distributed Networked Systems: Theory and Practice}
+\label{chap:distributed-systems}
+
+\section{Necessity of Distributed Computation for PRA}
+\label{sec:necessity-ds-pra}
+The computational demands of modern PRA quantification create a compelling case for distributed approaches. PRA models for complex nuclear facilities, particularly for advanced reactors, integrate large event trees with functional events linked to fault trees across multiple initiating hazards. This architecture leads to a combinatorial explosion, where hundreds of event sequences linked to tens of fault trees can produce millions of logic gates and thousands of distinct basic events. The prevalence of k-out-of-n gates, which must be expanded into combinations of AND and OR gates, further increases this complexity. Furthermore, these models frequently contain non-coherent structures due to success paths, requiring exact solutions to avoid overlooking hidden prime implicants with significant probabilities. The presence of common-cause failures, shared support systems, and hazard-induced correlations invalidates the assumption of event independence, necessitating more sophisticated and resource intensive quantification. Additionally, calculating importance measures, performing sensitivity analysis on hundreds of fault trees, and applying extensive post-processing rules to event sequences to account for recovery actions or physical constraints each demand significant computational resources. Therefore, distributed computation becomes necessary not only for performance but also for feasibility. With current PRA tools, which often run serially or only with limited parallelism, executing all of these analyses together can be impractical because they may not finish within reasonable time limits or fit within the memory of a single machine.
+
+The heterogeneity of PRA workloads makes them particularly well suited for distributed computation. Different quantification tasks, such as point estimation, importance measure calculation, sensitivity analysis, and uncertainty analysis, impose different computational and memory requirements. A distributed system can map these heterogeneous workloads onto available hardware more effectively; for example, memory intensive cut set manipulation can be assigned to machines with large RAM, while Monte Carlo based uncertainty calculations can be distributed across many CPU cores or accelerators when such hardware is available. This flexibility allows the computational strategy to be adapted to the structure of the PRA task rather than forcing all calculations through the limitations of a single execution environment.
+
+The analysis workflow surrounding large PRA models also benefits substantially from distributed computation. Importance measure calculations can be parallelized at the basic event level, with each event's metrics evaluated independently, while individual simulation runs in Monte Carlo based uncertainty analysis can be distributed across computational nodes. Likewise, large scale post-processing of event sequence results can be divided across workers when rules are applied independently. More broadly, an open source distributed system gives the end user control over how and where that computation is deployed. Depending on organizational requirements, the same framework can be run on a single node, on a secure on-premise cluster, or on approved cloud infrastructure. In this way, the objective is not to prescribe a single deployment model, but to give PRA practitioners the ability to use the computational resources available to them while retaining control over performance, security, and operational constraints.
+
+\section{Definition and Characteristics of a Distributed Networked System}
+\label{sec:ds-definition}
+A distributed networked system is a collection of independent computing nodes connected through a network that collaborate to appear as a single computing system to end users. Unlike a monolithic application running on a single machine, distributed systems spread processes and resources across multiple computers, enabling capabilities that would be impossible for any single node to achieve alone. Distributed systems are characterized by several key attributes \cite{steen_distributed_2023}:
+\begin{itemize}
+    \item \textbf{Partial failure:} meaning the ability to continue functioning despite partial failures, where some components may fail while others remain operational.
+    \item \textbf{Resource sharing:} enables multiple users or applications to access and utilize hardware, software, and data across the network.
+    \item \textbf{Distribution transparency:} represents the ideal goal of hiding the distributed nature of the system, making it appear as a single unified entity, though in practice this abstraction is necessarily imperfect.
+    \item \textbf{Dependability:} encompasses availability, reliability, safety, and maintainability, ensuring the system operates correctly even when faults occur.
+    \item \textbf{Security:} protects against unauthorized access and malicious attacks across the distributed infrastructure.
+    %\item \textbf{Openness:} allows systems to be built from standard, interoperable components that can communicate through well-defined interfaces.
+\end{itemize}
+
+When designing a distributed system, developers must address the "fallacies of distributed computing" i.e., common but false assumptions made in this domain \cite{wilson_eight_nodate}. Among these are the beliefs that the network is reliable, secure, and homogeneous; that latency is zero and bandwidth infinite; that topology does not change; and that there is only one administrator. Mature system design acknowledges these fallacies and builds mechanisms to handle them rather than pretending they don't exist. Correct designs implement strategies like timeouts, safe retries, failure containment etc. to manage these inevitable issues.
+
+\section{Architectural Patterns}
+\label{sec:architecture-patterns}
+Distributed systems can be designed following several common architectural patterns, each suited for specific requirements \cite{steen_distributed_2023}:
+
+\begin{itemize}
+    \item \textbf{N-tier Client-Server Architecture:} In this pattern, \emph{clients} send requests to one or more \emph{servers}, and the servers process the requests and return responses, often by reading from or writing to a database. In practice, client--server systems are commonly implemented as an $N$-tier (layered) design, where requests flow through a \emph{reverse proxy} tier (routing, load balancing), then a \emph{business logic} tier (application services), and finally a \emph{database} tier. Each tier has a clear responsibility and communicates through well defined interfaces, which improves separation of concerns. The main trade-off is added complexity and overhead at the interfaces, and changes that span multiple tiers may require coordinated updates across their interfaces. Figure~\ref{fig:client-server} shows this $N$-tier flow: clients connect to a reverse proxy, which forwards requests to the business logic tier that interacts with the database layer before returning a response to the client.
+    
+    \input{3-theory-and-practice/plots/client-server}
+
+    \item \textbf{Service Oriented Architecture (SOA):} SOA builds applications from independent services that communicate over a network using standardized service contracts (a shared “language” such as HTTP/JSON). It is often used at the enterprise level to integrate separate systems so that different business domains can share information. SOA can improve reuse and integration, but as the number of services and shared contracts grows, the overall system can become more complex to manage. Figure~\ref{fig:service-oriented-architecture} shows a service oriented system where a client application composes functionality by calling multiple backend services through well defined interfaces.
+    
+    \input{3-theory-and-practice/plots/service-oriented-architecture}
+
+    \item \textbf{Event Driven Architecture:} In event driven systems, components communicate by publishing and consuming \emph{events}. Producers publish events (e.g., \texttt{TransactionCompleted}) to an event broker or message channel, and consumers subscribe to the events they care about (e.g., receipt emails, analytics updates, loyalty points). This provides strong decoupling because producers do not need to know which consumers exist, and consumers can process events asynchronously (including catching up after downtime). This pattern is especially useful when many parts of a system must react to the same business activity and when keeping an event history is important. Figure~\ref{fig:event-driven-architecture} depicts an event broker that receives events from producers and delivers them to multiple subscribers, enabling asynchronous processing and loose coupling between services.
+    
+    \input{3-theory-and-practice/plots/event-driven-architecture}
+
+    \item \textbf{Microservices Architecture:} Microservices decompose an application into small, independently deployable services, each responsible for a narrow business capability. Services typically communicate through APIs and can be developed, deployed, and scaled independently. Microservices can be viewed as a fine grained evolution of SOA, but they usually favor simpler protocols and more decentralized service ownership. The main trade-off is increased operational complexity such as deployment automation, monitoring, tracing, and managing distributed failures. Figure~\ref{fig:microservices} illustrates an e-commerce system split into multiple small services that the front end can call independently (e.g., catalog, checkout, payments).
+    
+    \input{3-theory-and-practice/plots/microservices}
+
+    \item \textbf{Peer-to-Peer (P2P) Architecture:} In a peer-to-peer system, nodes act as both clients and servers and share their own resources (storage, bandwidth, or compute) without relying on a central server. This pattern is common in file sharing systems and blockchain networks. P2P can improve resilience and avoid single points of failure, but it makes coordination, trust, and security more challenging. Figure~\ref{fig:peer-to-peer} shows a peer-to-peer network where nodes communicate directly with each other, forming a decentralized mesh for sharing data and work.
+    
+    \input{3-theory-and-practice/plots/peer-to-peer}
+\end{itemize}
+
+\section{Queueing Systems in Distributed Environments}
+\label{sec:ds-queueing}
+Queueing systems provide critical infrastructure for managing workload distribution and decoupling components in distributed systems. They act as buffers between producers and consumers of work, allowing systems to process variable loads of varying priorities and handle component failures gracefully.
+
+Message brokers implement queueing patterns using either point-to-point messaging, where each message is consumed by exactly one consumer, or publish-subscribe messaging, where messages are broadcast to multiple interested consumers. These brokers provide durability by persisting messages to disk, ensuring that work isn't lost during system failures. They also enable load leveling by absorbing traffic spikes and distributing work to consumers at their optimal processing rate. The workflow for a typical message broker is shown in Fig. \ref{fig:message-broker}.
+
+% \input{3-theory-and-practice/plots/message_broker}
+\input{3-theory-and-practice/plots/message-broker}
+
+Distributed queueing systems face unique challenges in maintaining message ordering across multiple consumers, ensuring \textit{exactly once processing} semantics, and scaling throughput horizontally. Priority queueing introduces additional complexity by requiring the system to manage multiple queues with different service levels, preempt lower priority work when higher priority work arrives, and ensure fairness across users, job types and computational resources. For PRA quantification, this enables urgent analysis requests (e.g., point estimation or probability quantification) to jump ahead of batch processing jobs (e.g., uncertainty quantification, importance measures and sensitivity studies).
+
+Dead letter queues handle messages that cannot be processed successfully after multiple attempts, providing a mechanism for manual intervention and analysis of persistent failures without blocking the entire processing pipeline.
+
+%\section{Challenges in Distributed Computing}
+%\label{sec:ds-challenges}
+
+%Distributed systems introduce complex challenges that stem from their fundamental nature. Partial failure represents the main challenge, where some components can fail while others continue operating, creating states that are impossible in single node systems. This uncertainty is only increased by unreliable networks, where messages may be lost, delayed, duplicated, or delivered out of order, making it impossible to distinguish between slow responses and actual failures.
+
+%Consistency management presents another big challenge. When data is replicated across multiple nodes, updates must propagate to all copies, creating temporary inconsistencies. Strong consistency models that ensure all nodes see the same data simultaneously come at the cost of performance and availability, while weaker models improve performance but complicate the application development process.
+
+%Coordination difficulties arise from the lack of a global clock. Physical clocks on different machines drift apart and can jump forward or backward during synchronization, making timestamp based ordering unreliable. Process pauses due to garbage collection, virtualization, or operating system scheduling can make nodes appear dead to their peers, leading to conflicting actions when paused processes resume.
+
+%Distributed transactions that span multiple nodes require complex protocols like two phase commit, which introduces blocking scenarios where participants remain uncertain about transaction outcomes if the coordinator fails. For example, in a distributed banking system, if a funds transfer between two accounts on different databases is in the "prepare" phase and the coordinating service crashes, both accounts may remain locked indefinitely, awaiting a final commit or abort command. Consensus algorithms which enable nodes to agree on values despite failures, are fundamental to many distributed operations, like electing a new leader to resolve such a deadlock, but they themselves introduce latency and complexity as nodes must communicate and vote to reach agreement, slowing down the system during the process.
+
+%Security challenges multiply in distributed environments due to increased attack surfaces, requiring authentication, authorization, and encryption across all communication channels.
+
+\section{Design Goals and Requirements}
+\label{sec:design-requirements-ds}
+
+The design of a distributed queueing system for PRA quantification must balance multiple competing objectives informed by both distributed systems theory and domain specific constraints.
+\begin{itemize}
+    \item \textbf{Reliability:} stands as the foremost requirement, ensuring the system continues operating correctly despite component failures and software errors. This necessitates redundant components, graceful degradation mechanisms, and comprehensive failure recovery procedures.
+
+    \item \textbf{Scalability:} must address both vertical growth through more powerful hardware and horizontal growth through additional nodes. The system should demonstrate reasonable performance improvements as resources increase, avoiding architectural bottlenecks that limit expansion. For PRA workloads, this means efficient utilization of resources across heterogeneous hardware such as CPUs and GPUs.
+
+    \item \textbf{Maintainability:} encompasses the ease with which engineers can understand, modify, and operate the system throughout its lifecycle. This requires clear modular boundaries, comprehensive documentation, standardized interfaces, and automated deployment processes. For nuclear applications where systems may remain in operation for decades, maintainability becomes particularly crucial.
+
+    \item \textbf{Interoperability:} represents a core requirement given the diverse ecosystem of PRA tools and formats. The system must provide adapters for both open and proprietary solvers, translate between different model representations, and present a unified interface to users regardless of the underlying calculation engine.
+
+    \item \textbf{Security:} implementations must enforce authentication, authorization, and auditing while accommodating the regulatory requirements of nuclear data. Role based access control, encrypted communication, and comprehensive audit trails become essential requirements.
+
+    \item \textbf{Performance:} objectives must address both throughput for batch processing and latency for interactive analysis. The system should maximize resource utilization while providing responsive feedback to users. For queueing systems, this involves efficient scheduling algorithms, work stealing between idle workers, and priority handling for time sensitive calculations.
+
+    \item \textbf{Operational simplicity:} ensures that the system can be deployed, monitored, and maintained by engineering teams without specialized distributed systems expertise. Comprehensive monitoring, meaningful metrics, and clear operational procedures are required for practical adoption in nuclear engineering organizations.
+
+    \item \textbf{Evolvability:} allows the system to incorporate new PRA solvers, analysis techniques, and hardware platforms without fundamental architectural changes. Versioned APIs, and backward compatibility mechanisms ensure the system can adapt to evolving requirements while preserving existing workflows and data.
+\end{itemize}
+
+In summary, the architectural discussion in this chapter shows that PRA quantification does not map cleanly onto either a traditional N-tier model or a fully decomposed microservices model. PRA specific constraints, including long running asynchronous computations and solver heterogeneity, instead motivate a hybrid approach that combines the scalability of microservices with the reliability of event-driven execution. These considerations directly inform the design goals listed above and form the basis for the system architecture presented in Chapter~4.

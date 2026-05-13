@@ -1,0 +1,315 @@
+\chapter{Case Study}
+\label{chap:experiments}
+
+\section{Model Description}
+
+For the case study, a Probabilistic Risk Assessment (PRA) model for the Generic Modular High Temperature Gas Cooled Reactor (MHTGR) is used \cite{hamza_openpra-orggeneric-mhtgr-model_2025}, which was developed using SAPHIRE and CAFTA. The MHTGR plant comprises four identical 350 MW(t) reactor modules driving two shared turbine generators for a total output of approximately 558 MW(e).
+
+The PRA model encompasses a comprehensive set of event trees and fault trees designed to capture the plant's response to initiating events. The analysis develops seven event trees, each based on a primary initiating event. Table~\ref{tab:mhtgr-initiating-events} shows the corresponding frequencies of the initiating events.
+
+\begin{table}[]
+\centering
+\caption{MHTGR initiating events and frequencies}
+\label{tab:mhtgr-initiating-events}
+\begin{tabularx}{\textwidth}{l >{\RaggedRight}X r}
+\toprule
+\textbf{Initiating Event} & \textbf{Description} & \textbf{Frequency (per year)} \\
+\midrule
+PCL & Primary coolant leaks & $2.6 \times 10^{-1}$ \\
+LOHTL & Loss of main loop cooling & $2.6 \times 10^{0}$ \\
+LOOP & Loss of offsite power & $5.0 \times 10^{-3}$ \\
+ATRS & Anticipated transients requiring SCRAM & $2.5 \times 10^{1}$ \\
+CRW & Control rod withdrawal & $1.0 \times 10^{-1}$ \\
+SGTL-S & Small steam generator leaks & $4.0 \times 10^{-1}$ \\
+SGTL-M & Moderate steam generator leaks & $4.0 \times 10^{-2}$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The event tree analysis models accident progression through safety functions including reactor shutdown, decay heat removal, and containment isolation. The complete model comprises 241 event sequences distributed across these 7 event trees as shown in Table~\ref{tab:mhtgr-event-tree-sequences}.
+
+\begin{table}[]
+\centering
+\caption{Event tree sequences in the MHTGR PRA model}
+\label{tab:mhtgr-event-tree-sequences}
+\begin{tabularx}{\textwidth}{l >{\RaggedRight}X r}
+\toprule
+\textbf{Initiating Event} & \textbf{Key Safety Functions} & \textbf{Sequences} \\
+\midrule
+Small SG tube leaks (SGTL-S) & Moisture detection, SG isolation, decay heat removal & 1 to 46 (46) \\
+Primary coolant leaks (PCL) & Reactor trip, RSCE shutdown, SCS/RCCS cooling & 47 to 96 (50) \\
+Anticipated transients (ATRS) & SCRAM logic, backup shutdown, heat removal & 97 to 130 (34) \\
+Control rod withdrawal (CRW) & PPIS detection, reactor trip, power excursion control & 131 to 138 (8) \\
+Loss of offsite power (LOOP) & Reactor trip, backup power, passive cooling & 139 to 150 (12) \\
+Moderate SG tube leaks (SGTL-M) & Rapid isolation, pressure control, backup cooling & 151 to 213 (63) \\
+Loss of HTS cooling (LOHTL) & Forced convection loss, shutdown, emergency cooling & 214 to 241 (28) \\
+\midrule
+\textbf{Total} & & \textbf{241} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The fault tree analysis provides detailed reliability models for critical safety systems, with each tree typically decomposed into 5 to 15 subsystems. The primary systems modeled are listed in Table~\ref{tab:fault-tree-systems}.
+
+\begin{table}[]
+\centering
+\caption{Fault tree models for MHTGR safety systems}
+\label{tab:fault-tree-systems}
+\begin{tabularx}{\textwidth}{l >{\RaggedRight\arraybackslash}X}
+\toprule
+\textbf{System} & \textbf{Safety Function} \\
+\midrule
+Heat transport system (HTS) & Primary heat removal via forced helium circulation \\
+Shutdown cooling system (SCS) & Active decay heat removal using auxiliary blower loop \\
+Reactor cavity cooling system (RCCS) & Passive heat removal from reactor vessel \\
+Reserve shutdown control (RSCE) & Backup neutron absorbing material injection \\
+Steam isolation and dump system & Secondary system isolation and pressure control \\
+Relief valves & Primary and secondary system pressure relief \\
+Reactor trip system & Control rod scram and reactor shutdown \\
+%Failure to trip reactor using RSCE (FT34)
+%Failure of HTS in at least One Module (FT104)
+%Failure of SCS When One Module Requires Cooling (FT174)
+%Failure of SCS (FT196)
+%Failure of SCS when Four Modules Require Cooling (FT197, FT198 and FT199)
+%Intentional depressurization fails (FT215)
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The model includes 170 basic events representing distinct component failure modes and approximately 100 repair events to account for system recovery processes. These events are parameterized with mean failure frequencies or probabilities based on component type and operational context.
+
+\section{Setup Description}
+The study used four solver configurations: SAPHSOLVE (Windows version), serial SCRAM, distributed SCRAM, and PRAXIS (in both CPU and GPU modes). All solver configurations were set to compute event sequence frequencies and the number of minimal cut sets for each event sequence. Three truncation settings were evaluated: no truncation, to determine whether all cut sets could be captured, and truncation limits of $10^{-12}$ and $10^{-20}$. Single machine CPU based executions were performed on a system with an Intel i7-13700K processor and 32~GB of RAM under standard processing conditions. Single machine based PRAXIS GPU runs were executed on a workstation equipped with an NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition GPU with 96~GB of GDDR7 memory. Distributed quantifications were executed on a high performance on premise cluster with 12 nodes. For this study, only 5 nodes were used: 1 manager node and 4 worker nodes. The manager and worker nodes are equipped with Intel Xeon CPUs (24 and 128 vCPUs, respectively), 128~GB and 256~GB of RAM, and 4~TB and 1~TB of NVMe storage, respectively. The deployment was scaled to support up to 128 workers.
+
+\subsection{Description of the Studies}
+Four studies were performed to evaluate the proposed distributed quantification system. Together, they demonstrate the capabilities and advantages of the system, highlight its limitations, and examine the effectiveness of the measures introduced to mitigate those limitations.
+
+(a) \textbf{Multiple concurrent job handling:}
+The first study evaluates how well the distributed system handles large numbers of concurrent jobs submitted by users. It focuses on scalability and speedup as the number of workers increases. The CRW event tree is quantified using three configurations: SAPHSOLVE (serial), SCRAM (serial), and distributed SCRAM. For distributed SCRAM, the number of workers is varied from $2$ to $128$, while the number of simultaneously submitted jobs is varied from $1$ to $10,000$.
+
+(b) \textbf{Robust execution of large event tree jobs:}
+Very large quantification tasks can run for a long time, become stuck, or fail after many hours, making it difficult to determine whether they will ever complete and risking complete loss of computational effort upon failure. The second study addresses this by introducing a three stage workflow (preprocessing, processing, and postprocessing) in which a large event tree is decomposed into individual event sequences. This decomposition enables partial retention of results, even if some sequences fail, and allows the distributed system to requeue failed jobs or to move repeatedly failing jobs into dead letter queues, and to continue processing the remaining sequences. In this way, the system aims to guarantee execution of large event tree jobs in a fault tolerant manner, or at least to preserve partial results under worker or job failures. For this study, the MHTGR model is quantified using SAPHSOLVE, serial and distributed SCRAM with $2$ to $128$ workers.
+
+(c) \textbf{Adaptive quantification:}
+Even after decomposing an event tree into individual event sequences, the overall quantification time is governed by the slowest and longest running sequence. Thus, simple decomposition alone does not resolve load imbalance issues. The third study therefore introduces an adaptive quantification process that dynamically adjusts the truncation limit for each event sequence. The method first performs a quick exact calculation of the sequence frequency, then defines lower and upper truncation limits based on that frequency. It iteratively re-quantifies the event sequence until the convergence criteria is satisfied. This study evaluates how such adaptive truncation can reduce runtime and still maintain the desired level of numerical accuracy.
+
+(d) \textbf{Stress testing:}
+The final study focuses on the overall throughput and latency of the distributed system under large request loads. The LOOP event tree is used with a truncation limit of $10^{-12}$. This model is repeatedly submitted to the quantification API endpoint up to $10^{6}$ times, and an equal number of requests is then issued to retrieve the corresponding results. The number of workers is fixed at $128$ for this stress test. The objective is to determine how many quantification requests and result-retrieval operations the system can handle concurrently without failure, and to characterize the limits at which throughput and latency begin to degrade, even for relatively small jobs with a large worker pool.
+
+The next section presents the detailed description and the results of these four studies.
+
+\section{Results and Discussion}
+\subsection{Concurrent Job Handling and Performance}
+This study evaluates how well distributed SCRAM handles large numbers of concurrent jobs and how its performance changes as the workload increases. Practical PRA studies can contain tens of event trees, tens to hundreds of fault trees, and hundreds of event sequences. Repeated calculations of this kind also appear in sensitivity, importance, and uncertainty analyses, where the same quantification must be performed many times while only the probabilities of basic events or CCF groups are changed.
+
+The CRW event tree from the MHTGR model was used as the benchmark model. One full evaluation of the CRW event tree was counted as one job. Since the CRW event tree contains 8 event sequences, the workload range of 1 to 10{,}000 jobs corresponds to 8 to $8.00E+04$ event sequences in total. A comparison is made between serial SAPHSOLVE (Windows version), single-process SCRAM, and distributed SCRAM configurations using 2, 4, 8, 16, 32, 64, and 128 workers. As a representative example, 10{,}000 jobs correspond to changing the probabilities of 1{,}000 basic events from 0.1 to 1.0 in increments of 0.1.
+
+\input{6-experimental-evaluation/plots/performance}
+\input{6-experimental-evaluation/plots/speedup}
+
+Figure~\ref{fig:multiple_concurrent_job} shows the wall-clock time as a function of the number of jobs and workers, and figure~\ref{fig:performance} shows the speedup of the distributed system relative to the serial solvers for different numbers of workers. At the low end of the workload range, the fixed cost of job creation, queueing, broker communication, dispatch, worker coordination, and result collection dominates. For this reason, when only a few jobs are submitted, single process SCRAM is usually faster than the distributed configurations, and increasing the number of workers beyond the number of available jobs provides little benefit. As the number of jobs increases, this fixed overhead is amortized, the workers remain busy for longer periods, and the benefit of distributed execution becomes clear.
+
+For $1{,}000$ jobs, SAPHSOLVE required about $9.31E+03$~seconds ($\approx 1.55E+02$~minutes), while single process SCRAM required about $6.57E+03$~seconds. Distributed SCRAM reduced the runtime to about $3.53E+03$, $1.99E+03$, $8.53E+02$, $4.29E+02$, $2.16E+02$, $1.15E+02$, and $6.60E+01$~seconds for 2, 4, 8, 16, 32, 64, and 128 workers, respectively. For $10{,}000$ jobs, SAPHSOLVE required about $9.31E+04$~seconds ($\approx 2.59E+01$~hours), while single process SCRAM required $6.56E+04$~seconds ($\approx 1.82E+01$~hours).
+
+The speedup $S(N)$ for $N$ workers is defined in the standard way as:
+\begin{equation}
+  S(N) = \frac{T_{\text{serial}}}{T_{\text{parallel}}(N)}
+\end{equation}
+where $T_{\text{serial}}$ is the wall-clock time of the single process SCRAM run, and $T_{\text{parallel}}(N)$ is the wall-clock time when the same workload is executed using $N$ workers in the distributed system. Using distributed SCRAM, the wall-clock time was reduced to approximately $3.43E+04$, $1.70E+04$, $8.53E+03$, $4.29E+03$, $2.17E+03$, $1.14E+03$, and $6.45E+02$~seconds for 2, 4, 8, 16, 32, 64, and 128 workers, respectively. Taking the single process SCRAM runtime as the serial baseline for the $10{,}000$ job case, the corresponding speedups are 1.91x, 3.85x, 7.69x, 15.30x, 30.16x, 57.52x, and 101.67x.
+
+Even though the jobs in this experiment are independent and, in principle, $100\%$ parallelizable, the scaling curves still show behavior similar to Amdahl's law. The computational part of each job is embarrassingly parallel, but the full workflow still contains serial and overhead components that do not disappear when more workers are added. Jobs must be created by the producer, submitted to the message broker, placed in a queue, dispatched to workers, and collected again when the results are returned. Each worker must receive a job, deserialize its input, initialize or load the model if necessary, execute the analysis, serialize the results, and send them back. These additional steps introduce time that cannot be parallelized.
+
+As the number of jobs increases, the system initially shows near linear scaling, but the speedup eventually begins to flatten. For a fixed number of workers, increasing the number of jobs increases queueing delay (latency) because more jobs must wait before a worker becomes available. For a fixed workload, adding more workers reduces the computation time per worker, but it does not remove the above mentioned overheads. As a result, these costs become a larger fraction of the total runtime at high worker counts.
+
+This explains why, even with 128 workers, the maximum observed speedup for $10{,}000$ jobs is 101.67x rather than the ideal 128.00x. The gap can be attributed to the time required for the producer to package and enqueue each job, network latency between the producer, the message broker, and the workers, internal routing delay inside the message broker, the cost of serializing and deserializing job data, worker side model initialization, and contention for shared resources such as disks or file systems when writing logs or saving results.
+
+An important feature of this study is that the resulting cut sets remain the same and only the overall probabilities or frequencies change. Because of this, the runtime of each job is very similar. This symmetric workload is easy to balance across workers and contributes to the good, though not perfectly linear, scaling observed in the figures. Overall, the results show that distributed SCRAM can substantially reduce the execution time of large batches of independent PRA calculations, including sensitivity analyses, importance measure studies, uncertainty quantification, and repeated scenario evaluations, while also showing that communication and coordination overhead place a practical upper bound on the achievable speedup.
+
+\subsection{Robust Execution of Large Event Tree Jobs}
+Very large event tree quantification jobs are difficult to execute robustly because a single stalled or failed run can waste many hours of computation and provide little information about which part of the model caused the problem. To study this behavior, the full set of MHTGR event trees was quantified at a truncation limit of $1E-20$ using SAPHSOLVE and SCRAM. In the baseline run, each event tree was submitted as a single large job without event sequence decomposition. Under this setup, both tools were able to solve only 5 of the 7 event trees. In particular, the PCL and ATRS event trees could not be solved. The baseline results have been summarized in Table~\ref{tab:mhtgr_robust_run1}.
+
+\input{6-experimental-evaluation/tables/mhtgr_robust_run1}
+
+The same calculation was then repeated in the distributed system using the SAPHSOLVE and SCRAM executables via the \texttt{/q/execute/saphsolve} and \texttt{/q/execute/scram} endpoints, with event sequence decomposition enabled. For SAPHSOLVE, this was done by splitting the input file into separate event sequence inputs, since SAPHSOLVE is closed source and only its file level interface can be manipulated. For SCRAM, the PDAG construction step was decomposed. In the original executable workflow, individual PDAGs are created and quantified in a "for" loop. In the distributed workflow, the PDAGs for all event sequences are obtained first and then distributed to workers, which quantify them independently and return sequence level results for final aggregation. The results of this second run have been summarized in Table~\ref{tab:mhtgr_robust_run2}.
+
+\input{6-experimental-evaluation/tables/mhtgr_robust_run2}
+
+A direct comparison of the two result summaries shows the main trade-off of this approach. For event trees that were already solvable in the baseline run, sequence level decomposition adds a small amount of overhead because the system must split the work, dispatch more jobs, and aggregate the returned results. However, this overhead is outweighed by the gain in robustness for difficult jobs. In the decomposed workflow, SCRAM was able to quantify all event trees, including PCL and ATRS, which failed in the original run. For SAPHSOLVE, ATRS also became solvable, and the PCL failure no longer appeared as an unexplained full job failure. Instead, the problematic sequence was isolated to PCL-63.
+
+This is the main advantage of the preprocessing, processing, and postprocessing workflow. Failed sequence jobs can be re-queued for quantification automatically, and if a sequence keeps failing it can be moved to a dead letter queue while the remaining event sequences continue to run. As a result, the full run does not lose all completed work, and the user still receives the partial results together with a clear indication of which sequence caused the problem. In this study, PCL-63 continued to fail in SAPHSOLVE and was therefore moved to the dead letter queue, while the remaining sequences completed normally.
+
+In the decomposed run, the two dominant event trees were PCL and ATRS. PCL generated $8.30E+08$ minimal cut sets and required approximately $4.20E+01$~h in SAPHSOLVE and $5.28E+00$~h in SCRAM, while ATRS generated $2.10E+08$ minimal cut sets and required approximately $6.84E+00$~h in SAPHSOLVE and $5.25E-01$~h in SCRAM. At the event sequence level, the three largest contributors were PCL-91, PCL-76, and PCL-63, which generated approximately $3.67E+08$, $2.23E+08$, and $1.99E+08$ minimal cut sets, respectively. This explains why the PCL event tree dominates the total execution time and why sequence level distribution is especially useful for such workloads.
+
+The main points of this calculation are summarized below:
+\begin{itemize}
+    \item Sequence level decomposition changed the previously unsolved PCL and ATRS event trees into solvable workloads in SCRAM.
+    \item For SAPHSOLVE, decomposition exposed the main failure point as PCL-63 instead of losing the entire PCL job without diagnosis.
+    \item The distributed workflow improved robustness by allowing successful sequences to finish, failed sequences to be retried, and repeatedly failing sequences to be moved to a dead letter queue.
+    \item The approach also revealed the main computational hotspots, namely PCL-91, PCL-76, and PCL-63, which produced the largest numbers of minimal cut sets and dominated the runtime.
+\end{itemize}
+
+Overall, these results show that event sequence decomposition is not only a parallelization strategy but also a robustness mechanism. It makes large event tree jobs easier to diagnose, more fault tolerant during execution, and less likely to lose all computational effort when part of the workload fails.
+
+\subsection{Adaptive Quantification}
+In realistic PRA models, event trees (linked with fault trees) rarely take the same amount of time to solve. Some event trees can be quantified in seconds, while others may take hours or even days. A major limitation of traditional serial solvers is that no result can be reported until the entire quantification of the input model is finished. If a long running analysis fails near the end, all progress is lost, and it is often difficult to tell whether the solver is still making progress or is stuck in some internal step. In addition, enumerating all minimal cut sets can be extremely expensive because some event trees generate billions of cut sets, even though many of these contribute negligibly to the associated event sequence frequencies. To keep run times manageable, practitioners therefore impose truncation limits on cut set probabilities. A commonly used engineering value is $10^{-12}$; cut sets whose probability is below this limit are not generated or are discarded. The NUREG/CR-2728 report originally suggested $10^{-9}$ as a starting truncation limit \cite{nureg_2728}, but that recommendation was made in 1982. Since then, both algorithms and hardware have improved considerably, so lower truncation limits are computationally feasible in many cases. However, any fixed global truncation limit remains an ad hoc choice, and it can have unintended consequences for both accuracy and run time. For example, using a global truncation limit of $10^{-12}$ for an event sequence whose frequency is only about $10^{-3}$ can still force the solver to enumerate a very large number of cut sets that contribute very little to the final event sequence frequency.
+
+In this study, the default truncation limit of SCRAM is $10^{-20}$ and the default truncation limit of SAPHSOLVE is $10^{-12}$. The same MHTGR calculation presented in the previous section is therefore revisited, this time using the distributed SCRAM solver. The full model contains 7 event trees and 241 event sequences. Figure~\ref{fig:adaptive_quantification_pt1} shows the execution times of the 7 event trees at a truncation limit of $10^{-20}$ for worker counts ranging from 1 to 32, since increasing the number of workers beyond 32 produced no further reduction in runtime. As shown in the previous section, with event sequence decomposition serial SCRAM run requires about $2.15 \times 10^{4}$~s (approximately $6~h$), and, as the figure shows, the improvement quickly saturates even in the distributed runs. The reason is that three event sequences dominate the workload: PCL-91, PCL-76, and PCL-63. The curves initially rise and then plateau before PCL-91 begins to get quantified, showing that the entire run is effectively waiting for the slowest sequence. With 4, 8, 16, and 32 workers, the total execution time is still about $8.34 \times 10^{3}$~s, $7.89 \times 10^{3}$~s, $7.63 \times 10^{3}$~s, and $7.27 \times 10^{3}$~s, respectively. This behavior is typical of real PRA applications: when jobs are highly imbalanced, the slowest job determines the minimum wall-clock time, no matter how many workers are available.
+
+\input{6-experimental-evaluation/plots/adaptive_quantification_pt1}
+
+The first practical response to this problem was simply to increase the global truncation limit to $10^{-12}$ and repeat the calculation. Under this setting all seven event trees were quantified successfully by both SAPHSOLVE and SCRAM, and the longest event sequences dropped from hours to only a few minutes. Table~\ref{tab:mhtgr_cutsets_1e12} summarizes the event tree cut set counts for the two solvers together with representative runtimes. The agreement in cut set counts is exact, and the total number of generated cut sets falls from just over $1.05\times 10^9$ at $10^{-20}$ to $3.97\times10^6$ at $10^{-12}$.
+
+\input{6-experimental-evaluation/tables/mhtgr_cutsets_1e12}
+
+The $10^{-12}$ truncation significantly reduces the computational burden, but it does not solve the underlying problem. In the MHTGR case, only 188 of the 241 event sequences return a nonzero event sequence frequency; the remaining 53 sequences are reported as exactly zero. A result of zero is not meaningful here, because it does not mean that the true event sequence frequency is zero. It only means that all of its cut sets fell below the chosen global threshold. Changing the truncation limit in this way therefore wastes computational resources, time, and analyst effort. It also shows why a single global truncation limit is not a good general strategy. Some event sequences have relatively high frequencies, so a very small global limit forces the solver to generate huge numbers of minimal cut sets that are individually insignificant. Those sequences then become the slowest jobs, and the slowest job sets the lower bound on the total runtime of the whole run.
+
+To address this, an "adaptive quantification" method is proposed. The basic idea is to separate two tasks: (1) computing the event sequence frequency, and (2) selecting only the significant minimal cut sets required to reproduce that frequency within a controlled error. Here, "significant" means cut sets whose probabilities contribute a non-negligible percentage of the exact event sequence frequency $f_{\text{exact}}$, so that the retained cut sets account for the major share of $f_{\text{exact}}$; cut sets whose individual or cumulative contribution is only a very small percentage of $f_{\text{exact}}$ do not need to be explicitly kept. The motivation is clear from the three dominant sequences identified earlier. PCL-91, PCL-76, and PCL-63 have event sequence frequencies of $1.05 \times 10^{-3}$, $5.44 \times 10^{-4}$, and $3.74 \times 10^{-4}$, respectively, yet under a global truncation limit of $10^{-20}$ they generated approximately $3.67\times 10^8$, $2.23\times 10^8$, and $1.99\times 10^8$ minimal cut sets. Most of these cut sets are not significant. Instead of using one truncation limit for an entire event tree, adaptive quantification assigns each event sequence its own threshold based on the scale of that sequence.
+
+Two adaptive routes are considered in this work. The first, which is used for the MHTGR results presented below, combines BDD and ZBDD. The BDD is used to compute the exact event sequence frequency, and the ZBDD is used to enumerate candidate minimal cut sets. The second route, discussed later in this subsection, combines Monte Carlo and MOCUS for cases where building the decision diagram is not feasible in practice.
+
+To clarify the BDD+ZBDD method, the relationship between the truncation limit and the number of cut sets is first examined. Normally, the distribution of cut set probabilities often follows a Zipf like distribution pattern \cite{zipf}: as the truncation limit is lowered by one order of magnitude, the number of cut sets above that threshold can increase by an order of magnitude or more. Thus, attempting to choose a single global truncation limit by numerical experimentation is inefficient and unreliable. Instead, our approach takes advantage of the Binary Decision Diagram (BDD) and Zero-suppressed BDD (ZBDD) representations already used in SCRAM.
+
+In the BDD representation, the event sequence frequency can be computed exactly by a simple recursive traversal. For a node with decision variable $x$ and child sub-functions $f_{x=1}$ and $f_{x=0}$, the function value $f$ is given by
+
+\begin{equation}
+  f = \operatorname{ite}(x, f_{x=1}, f_{x=0}) = x\,f_{x=1} + (1-x)\,f_{x=0}
+\end{equation}
+
+\input{6-experimental-evaluation/plots/zbdd_example}
+
+where $\operatorname{ite}$ denotes the ``if-then-else'' operation. Once the BDD for an event sequence has been constructed, evaluating its frequency over all nodes is a linear time operation in the size of the diagram. Building the BDD can be expensive in the worst case (O$(2^N)$). Given that the BDD can be built, the exact event sequence frequency $f_{\text{exact}}$ is readily available.
+
+ZBDDs are then used to enumerate minimal cut sets, that is, the paths in the decision diagram that lead to the terminal 1 node after applying a reduction rule that removes supersets and redundant combinations. Standard approximations such as the min-cut upper bound (MCUB) or the rare-event approximation (REA) can be applied to these minimal cut sets to estimate the event sequence frequency. However, when the BDD is used to obtain $(f_{\text{exact}})$, the minimal cut sets can be employed in a different manner: rather than approximating the frequency from scratch, they can be used to identify the smallest subset of cut sets that reproduces $(f_{\text{exact}})$ within a controlled error.
+
+The main computational challenge now becomes handling the potentially enormous number of minimal cut sets produced by ZBDD. Enumerating billions of cut sets into a flat list is infeasible in memory. In practice, the most expensive step in the whole quantification process is often the cut set enumeration step itself \cite{scramcpp_2026}, especially when the internal cut set representation has to be converted into flat lists. To accelerate quantification while simultaneously identifying significant cut sets, the number of materialized cut sets must be limited. Accordingly, a per-sequence threshold is introduced to filter out cut sets with probabilities below a specified value before materialization. This threshold is defined using machine epsilon, denoted by $(\varepsilon_{\text{mach}})$. This is the smallest positive number such that $1 + \varepsilon_{\text{mach}}$ is distinguishable from $1$ in floating point arithmetic. Probabilities smaller than $\varepsilon_{\text{mach}}$ cannot be represented reliably, so treating them as zero introduces no additional numerical error.
+
+For a given event sequence, let $f_{\text{exact}}$ be its exact frequency computed from the BDD. One or more candidate threshold values are then defined between $(\varepsilon_{\text{mach}})$ and $(f_{\text{exact}})$. Using the exact event sequence frequency itself as the threshold is not appropriate, because $f_{\text{exact}}$ is the probability of the entire event sequence and is therefore generally larger than the probability of any individual minimal cut set; as a result, the condition $p_i \ge f_{\text{exact}}$ would usually retain no cut sets at all, except in the degenerate case where a single cut set alone accounts for the entire sequence frequency. Stopping at machine epsilon is also not an adequate solution, because some event sequence frequencies may be much larger, for example 0.2, in which case a very large number of negligible cut sets would be enumerated. A simple practical approach is therefore to choose a middle ground between $f_{\text{exact}}$ and $\varepsilon_{\text{mach}}$. Three simple candidate threshold definitions based on classical means of \(f_{\text{exact}}\) and \(\varepsilon_{\text{mach}}\) are available:
+
+\begin{align}
+  \tau_{\log 10} &= 10^{\frac{\log_{10} f_{\text{exact}} + \log_{10} \varepsilon_{\text{mach}}}{2}}, \\
+  \tau_{\text{geo}} &= \sqrt{f_{\text{exact}} \, \varepsilon_{\text{mach}}}, \\
+  \tau_{\text{harm}} &= \frac{2 f_{\text{exact}}\, \varepsilon_{\text{mach}}}{f_{\text{exact}} + \varepsilon_{\text{mach}}}.
+\end{align}
+
+which lies between $\varepsilon_{\text{mach}}$ and $f_{\text{exact}}$ on a logarithmic axis. However, only \(\tau_{\log 10}\) was considered in this study. Any of these quantities can be used as a threshold; in practice they all serve the same purpose of discarding cut sets that are many orders of magnitude smaller than the dominant contributors. Moreover, if the highest minimal cut set probability for a sequence is already below $\varepsilon_{\text{mach}}$, then this mechanism automatically treats the entire sequence as numerically negligible without additional special handling.
+
+Once a threshold $\tau$ has been chosen, ZBDD is used to filter and keep only those enumerated minimal cut sets whose probability $p_i$ satisfies $p_i \ge \tau$. Let these retained cut sets be indexed as $i = 1, \dots, m$. Their probabilities can then be sorted in decreasing order, $p_1 \ge p_2 \ge \dots \ge p_m$. The cut sets are sorted because summation in an arbitrary order may cause the initial terms to make only negligible contributions to the event sequence frequency. Sorting places the most significant cut sets first, allowing the cumulative sum to converge toward the true frequency as efficiently as possible. With efficient sorting algorithms, this step has computational complexity on the order of $O(m \log m)$. The cumulative sum is then formed as follows:
+
+\begin{equation}
+  F_k = 1 - \prod_{i=1}^{k} (1 - p_i),
+\end{equation}
+
+which represents the contribution of the $k$ most probable minimal cut sets to the total event sequence frequency. The smallest $k$ is selected such that $F_k$ is greater than or equal to $f_{\text{exact}}$, that is,
+\begin{equation}
+  k^\star = \min \left\{ k : F_k \ge f_{\text{exact}} \right\}.
+\end{equation}
+The approximate frequency for this event sequence is then taken as $F_{k^\star}$, and the relative error is:
+
+\begin{equation}
+  \delta = \left| \log_{10}\!\left(\frac{F_{k^\star}}{f_{\text{exact}}}\right) \right|
+\end{equation}
+
+Because the cut sets are included in order of descending probability, $F_{k^\star}$ is, by construction, the best approximation that can be obtained from this filtered set of cut sets while using the smallest number of terms. Intuitively, this procedure keeps only the most important minimal cut sets, which contribute the bulk of the sequence frequency, and discards the extremely small ones that lie below both the threshold and the numerical resolution of the machine. In this way, adaptive quantification guarantees that the approximate frequency for each event sequence has a bounded and explicitly computable relative error, while drastically reducing the number of cut sets that need to be stored and processed.
+
+\input{6-experimental-evaluation/plots/adaptive_quantification_pt2}
+
+From Fig.~\ref{fig:adaptive_quantification_pt2} it can be seen that applying the BDD+ZBDD adaptive quantification approach greatly reduces the execution time for both the serial and distributed solvers. For the serial SCRAM run, the total execution time decreases from $2.1553 \times 10^{4}$~s to $1.82 \times 10^{3}$~s, a speedup of about $\approx 11.9\times$. For the distributed system, the improvement is even more visible. With 4 workers, the runtime is reduced from $8.34 \times 10^{3}$~s to $6.29 \times 10^{2}$~s (about $13\times$ faster); with 8 workers, from $7.89 \times 10^{3}$~s to $4.75 \times 10^{2}$~s (about $16.6\times$); with 16 workers, from $7.63 \times 10^{3}$~s to $3.41 \times 10^{2}$~s (about $22.4\times$); and with 32 workers, from $7.27 \times 10^{3}$~s to $3.27 \times 10^{2}$~s (about $22.2\times$). Increasing the number of workers from 32 to 64 yields only a small additional improvement, from $3.27 \times 10^{2}$~s to $3.23 \times 10^{2}$~s. This is because the longest running event sequence, PCL-91, still takes about $3.13 \times 10^{2}$~s even with adaptive quantification and thus continues to dominate the total runtime. In other words, the overall speedup is still limited by the slowest job, as observed earlier. Nevertheless, adaptive quantification provides a substantial benefit: for the full MHTGR model, the total runtime with 32 workers is reduced by a factor of about $\approx 22\times$ compared to the original, non-adaptive run with the same number of workers.
+
+% \input{6-experimental-evaluation/plots/adaptive_quantification_speedup}
+
+% As seen in Fig.~\ref{fig:adaptive_quantification_speedup}, the effect of adaptive quantification on speedup depends on both the number of workers and the number of jobs. For a single worker, the speedup increases steadily as more jobs are added. In this case, many of the jobs are significantly accelerated by adaptive quantification, so the benefit accumulates with the total workload.
+
+% For multiple workers (e.g., 2--32 workers), the behavior is more complex. The speedup first increases with the number of jobs, then drops for a range of intermediate job counts, and finally rises again for the last few jobs. The initial increase occurs because, without adaptive quantification, the early jobs take a substantial amount of time, and adaptive quantification greatly reduces that time. In the middle region, however, many of the additional jobs are inherently fast even without adaptive quantification. These correspond to low frequency event sequences that generate relatively few cut sets. Since adaptive quantification cannot speed up jobs that are already very fast, the overall speedup curve appears to flatten or decrease in this region.
+
+% The behavior at the end of the curve is dominated by the few longest running event sequences. Without adaptive quantification, the slowest of these (PCL-91) took about 7{,}118~s, and together the last three long running jobs controlled the total runtime. With adaptive quantification, the longest job now takes only about 313~s, so the speedup becomes most pronounced for these last three jobs. The large dips immediately before these three jobs occur because the fourth longest job in the original run takes only about 393~s, which is comparable to the longest adaptive quantification runtime of 313~s. As a result, the relative improvement there is much smaller.
+
+The BDD+ZBDD route works well when a decision diagram can be built, but this is not always possible. In the worst case, the time and space complexity of decision diagram methods are exponential, especially under poor variable ordering. In practice, the solver can also run out of memory during decision diagram addition operations or other BDD manipulations. ``NUS9601'' from the ARALIA dataset is one such example \cite{rakhimov_scram_2022}. For this reason, an alternative adaptive route based on Monte Carlo and MOCUS is also explored. In this variant, the event sequence frequency is estimated by Monte Carlo, and the same $\tau$ setting idea is used during cut set generation with MOCUS. MOCUS expands cut sets row by row, and a cut set row is discarded as soon as its probability falls below the chosen $\tau$. The Monte Carlo + MOCUS adaptive approach is used when BDD or ZBDD construction fails owing to exponential memory or time complexity. The Monte Carlo frequency estimator proceeds as follows:
+
+\begin{enumerate}
+    \item For each basic event, 64 uniform random numbers \(r_i \in [0,1)\) are generated in one batch.
+    \item The \(i\)-th bit of a uint64 word is set to 1 if \(r_i < p\), where \(p\) is the assigned failure probability; otherwise the bit is 0.
+    \item One CUDA thread processes one such uint64 word (64 independent trials), with thousands of threads running concurrently.
+    \item Gate evaluations use bitwise operations only: \(\&\) for AND gates, \(|\) for OR gates, \(\sim\) for NOT gates, and specialized threshold logic for \(k\)-out-of-\(n\) gates. After processing successive 64-trial chunks, the frequency estimate is:
+    
+    \[\hat{f} = \frac{\text{hits}}{\text{total trials}}\]
+    
+    where hits is the accumulated count of top-event bits equal to 1.
+\end{enumerate}
+
+
+Given \(\hat{f}\), the adaptive quantification proceeds in four steps: 
+\begin{enumerate}
+    \item First, \(\hat{f}\) is obtained from the Monte Carlo simulation.
+    \item Second, a sequence-specific threshold \(\tau\) is set between machine epsilon \(\varepsilon_{\text{mach}}\) and \(\hat{f}\).
+    \item Third, cut sets are generated row by row with the MOCUS algorithm: starting from the top event, OR gates spawn new rows (one per input) while AND gates multiply inputs into the current row; supersets and duplicates are eliminated immediately. The probability of each row is:
+    
+    \[p_{\text{row}} = \prod_j p_j,\]
+    
+    where \(p_j\) are the failure probabilities of the basic events in the row.
+
+    \item Fourth, upon expansion any row with \(p_{\text{row}} < \tau\) is discarded at once, pruning all its descendants without further materialization. Retained rows are later sorted by descending probability.
+\end{enumerate}
+
+This early pruning rule limits enumeration to only the significant minimal cut sets whose collective contribution reproduces \(\hat{f}\) within bounded relative error. Results from the Monte Carlo estimator are summarized in Figure~\ref{fig:mc_event_tree_analysis}. The scatter plot and boxplots of absolute logarithmic relative error \(|\log_{10}(p^*) - \log_{10}(\hat{f})|\) versus true event sequence frequency show that for all sequence families (ATRS, CRW, LOHTS, LOOP, PCL, SGTL-S, SGTL-M) frequencies \(\geq 10^{-9}\) yield errors tightly clustered below \(10^{-2}\), with narrow inter-quartile ranges. Below \(10^{-9}\) variance increases and outliers emerge.
+
+\input{6-experimental-evaluation/plots/mc_event_tree_analysis}
+
+The Monte Carlo + MOCUS pipeline remains under active development. At present, it already includes the core functionality required for adaptive quantification, namely a working Monte Carlo estimator for \(\hat{f}\) that can estimate event sequence frequencies above \(10^{-9}\) with confidence. Current development is focused on integrating these frequency estimates with the MOCUS implementation and improving convergence for rare events, where estimator variance becomes more pronounced. The main pending enhancements are variance-reduction techniques, specifically importance sampling, control variates, and stratified sampling. These are preferred over simply increasing the number of trials, because Monte Carlo variance decreases only as \(1/\sqrt{N}\), whereas runtime grows linearly with \(N\).
+
+\subsection{Load Testing / Stress Testing}
+
+\input{6-experimental-evaluation/plots/load_test_analysis}
+
+\subsubsection{Test 1: Heavy batch processing (LOOP Model)}
+In this scenario, a workload consisting of 10,000 users submitting heavy batch jobs ($>0.5MB$), each requiring the decomposition of event trees into individual sequences, was simulated. As shown in \textbf{Figure 1(a)}, scaling the number of job brokers from 1 to 6 resulted in a linear increase in throughput (from $25.6$ to $132.5$ req/s) and a significant reduction in latency (from $2.52$s to $0.48$s). However, increasing the replicas to 8 caused a sharp degradation in performance, with throughput dropping to $38.9$ req/s. This indicates a bottleneck caused by connection instability rather than computation limits. Specifically, the intense traffic saturated the message queueing and object storage services (RabbitMQ and MinIO), preventing them from responding to health check pings; this triggered connection drops after two consecutive health check failures. Consequently, \textbf{6 brokers} was identified as the optimal configuration for such heavy workload.
+
+\subsubsection{Test 2: High concurrency limits (Chinese Model)}
+For lightweight, non-batch jobs ($\sim 3KB$), the system limits were evaluated by increasing the number of concurrent users from 10,000 to 25,000. \textbf{Figure 1(b)} illustrates that the system maintained a $0\%$ error rate up to 15,000 users. However, pushing beyond this threshold to 20,000 users introduced a $1.13\%$ error rate, despite the throughput remaining relatively stable. Furthermore, scaling brokers from 8 to 64 at the safe limit of 10,000 users yielded negligible gains, plateauing at $\sim1200$ req/s. This suggests that for lightweight jobs, the bottleneck again shifts downstream to the ingestion capacity of the message broker and object storage services (RabbitMQ/MinIO).
+
+\subsubsection{Test 3: Sustained load stability}
+To assess long-term stability, the system was subjected to a sustained load of 10,000 users for 10 minutes. \textbf{Figure 1(c)} demonstrates that the system remained highly stable across 8, 16, and 64 broker configurations, processing over 1.4 million requests without failure. While the 64-broker setup provided the lowest latency ($3.97$s) and highest throughput ($1212$ req/s), the 8-broker configuration was surprisingly competitive, recording $4.18$s latency and $1195$ req/s throughput. This reinforces the conclusion that for sustained, lightweight workloads over-provisioning brokers provides diminishing returns.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Summary of load testing results and bottleneck analysis}
+    \label{tab:load-test-summary}
+    \begin{tabular}{@{}llll@{}}
+        \toprule
+        \textbf{Test ID} & \textbf{Workload Type} & \textbf{Optimal Config} & \textbf{Primary Bottleneck} \\ 
+        \midrule
+        Test 1 & Heavy Batch ($>0.5$ MB) & 6 Brokers & Brokers and service connection timeouts \\
+        Test 2 & High Concurrency ($\sim3$ KB) & 15,000 Users (Max) & Brokers and service connection limits \\
+        Test 3 & Sustained Load (10 min) & 8 Brokers & N/A (diminishing returns) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Cost Estimate for Cloud Based Deployment}
+\input{6-experimental-evaluation/plots/aws}
+
+To place the performance and cost profile of the distributed system presented in this work in perspective, the costs associated with running an identical workload on a state-of-the-art commercial cloud platform were analyzed. The projected operational expenditure for such an AWS hosted environment is estimated at approximately \$11,413 per month. The primary cost drivers are security governance (IAM Access Analyzer) and high volume storage (S3), which together account for over 55\% of the monthly budget. This estimate assumes a consistent workload utilizing 128 instances and significant message brokerage capacity to handle the load defined in the previous stress tests.
+
+To derive these figures, usage patterns were modeled based on a user base of 10,000 active participants. The API Gateway costs were calculated assuming each user operates at the rate limit of 10 requests per hour continuously (24 hours over 30 days), resulting in a total of 72 million monthly requests. Identity management (IAM) costs reflect the maximum allowance of 10,000 distinct monitored accounts. Compute and messaging resources were provisioned to match the stress test environment, consisting of a single EKS cluster orchestration plane managing 128 EC2 worker nodes (1 vCPU, 4 GB RAM each) and 8 dedicated Amazon MQ broker instances. Storage costs for S3 are projected based on a hard cap of 10 GB per user, totaling 100 TB of persistent data.
+
+It is important to note that several managed AWS services were explicitly excluded from this estimate as their functionality is handled by platform-agnostic alternatives in our architecture. Specifically, external container registries (Docker Hub/GitHub Container Registry) are used instead of Amazon ECS, dead letter queues (DLQs) are managed natively within RabbitMQ, autoscaling is handled through KEDA, and MongoDB is used in place of Amazon DynamoDB.
+
+\begin{table}[htbp]
+    \centering
+    \caption{AWS Infrastructure Cost Estimate (US East - Ohio)}
+    \label{tab:aws-cost-estimate}
+    \begin{tabular}{@{}llrr@{}}
+        \toprule
+        \textbf{Service} & \textbf{Configuration Details} & \textbf{Monthly (USD)} & \textbf{Annual (USD)} \\ 
+        \midrule
+        IAM Access Analyzer & 10,000 accounts monitored & 4,000.00 & 48,000.00 \\
+        S3 Standard & 100 TB storage, Data transfer & 2,321.74 & 27,860.88 \\
+        Amazon EC2 & 128 $\times$ m6g.medium & 1,812.74 & 21,752.83 \\
+        Amazon MQ & 8 $\times$ m5.large (RabbitMQ) & 1,784.32 & 21,411.84 \\
+        Amazon CloudWatch & Metrics \& DB Insights & 1,168.90 & 14,026.80 \\
+        Amazon API Gateway & 72M Requests/mo & 252.00 & 3,024.00 \\
+        Amazon EKS & 1 Cluster & 73.00 & 876.00 \\
+        \midrule
+        \textbf{Total} & & \textbf{\$11,412.70} & \textbf{\$136,952.40} \\
+        \bottomrule
+    \end{tabular}
+\end{table}

@@ -1,0 +1,35 @@
+\begin{abstract}
+Probabilistic Risk Assessment (PRA) is essential for risk-informed decision-making in industries such as nuclear, aerospace, oil and gas, chemical processing plants etc. However, the software tools used to analyze PRA models such as event trees, fault trees, and other risk models are often tied to specific operating systems and are hard to scale across different computing resources. This research work presents a domain specific distributed networked system that enables high throughput PRA quantification as a service. It provides a uniform, solver agnostic interface that brings multiple PRA engines together behind a single API gateway. The gateway isolates users from tool and operating system constraints and runs analyses on CPUs and GPUs across distributed memory and on-premise cluster. The research contributions can be divided into three parts. First, it provides a deployable microservice that runs PRA jobs asynchronously for multiple users and supports large volumes of jobs. It uses open source container orchestration to automate deployment, scaling, and routine management. Second, it includes an interoperability layer for PRA solvers that uses a common job specification and converts user submitted models to the supported solver formats automatically. Third, it introduces a three-step preprocessing, processing, and postprocessing pipeline and an adaptive quantification method. The adaptive method uses decision diagrams or Monte Carlo sampling to produce quick frequency estimates and to set a truncation limit automatically for each event sequence, which is then used to extract cut sets up to that value. A case study of MHTGR models using the system shows that the pipeline and adaptive quantification speed up analyses of large models while still producing reliable quantification results. The platform also provides controlled environments with role based access for regulated and proprietary data. For the nuclear engineering community, the system enables repeatable, high volume PRA quantification that are easier to run, compare, and share. 
+%It also provides a software foundation that can add future solvers without disrupting existing analysis practices.
+\end{abstract}
+
+\makecopyrightpage
+\maketitlepage
+
+%%Dedication%%
+\begin{dedication}
+To my wife, \textit{Ridhi}, for her unwavering support, patience, encouragement, and our meaningful conversations throughout this journey. To my parents, \textit{Hena and Sagar}, and my sister, \textit{Ripa}, for instilling in me the values, ethics, and love of learning and foundation of research that made this work possible.
+\end{dedication}
+
+%%Biography%%
+\begin{biography}
+Hasibul Hossain Rasheeq was born in a small city in Bangladesh, Chandpur, on 13th October, 1998. He earned his Bachelor of Science degree in Nuclear Science and Engineering from the Military Institute of Science and Technology (MIST) in Bangladesh.
+
+Prior to joining NCSU for his doctoral studies, he was an active contributor to the OpenPRA Initiative, an open source platform to support real-time, risk-informed decision-making for nuclear power plants. His current work focuses on modernizing PRA tools by transitioning them to web-based platforms, distributed networked systems for near real-time quantification of large and complex PRA models, and modern hardware (e.g., GPU) accelerated solvers based on Monte Carlo methods and Boolean matrices. He also develops utilities for PRA model conversion and benchmarking, and explores machine learning methods, including agentic retrieval augmented generation, to automate PRA model generation from P\&ID and process flow diagrams.
+\end{biography}
+
+\begin{acknowledgements}
+I am really grateful to my supervisor, Prof. \textit{Mihai A. Diaconeasa}, for his invaluable mentorship and guidance. His clear feedback, patience throughout the research process, and constant availability for discussion were instrumental in shaping the direction and quality of this research work.
+
+I extend my sincere thanks to my colleagues in the PRA Group at North Carolina State University. I am especially grateful to Arjun Earthperson for the countless hours he spent helping me debug issues, set up the project boilerplate, and support the on-premise cluster infrastructure, and for proposing the idea behind the model translation tool. I also thank Kirill Shumilov for thoughtful feedback on my research writing and for improving the presentation and quality of the data. My thanks go to Egemen and Asmaa for providing the benchmark datasets and the baseline results that made the benchmarking work possible. Finally, I thank Yahya and Priyanka for their steady encouragement and for checking in on me throughout my graduate studies, which helped me stay grounded and keep moving forward.
+
+I also appreciate the collaborative support from Idaho National Laboratory, especially \textit{Stephen T. Wood} and \textit{Jordan Boyce}, for their valuable time, insightful feedback, and encouragement.
+
+This research was supported by the U.S. Department of Energy’s Nuclear Energy University Program (NEUP) under project number 21-24004. Any opinions, findings, conclusions, or recommendations expressed in this work are those of the author and do not necessarily reflect the views of the U.S. Department of Energy.
+\end{acknowledgements}
+
+\thesistableofcontents
+\thesislistoftables
+\thesislistoffigures
+
+\makeauthorshipstatementpage
