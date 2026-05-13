@@ -4,11 +4,7 @@
 The following enhancements are planned for the distributed PRA quantification system:
 
 \begin{enumerate}
-    \item Implement caching mechanisms for the adaptive method to store intermediate results at each truncation limit or limit order, preventing redundant calculations by reusing previously computed cut sets when increasing precision.
-
     \item Integrate the GPU accelerated Monte Carlo solver in the distributed system, extending the distributed framework to support heterogeneous computing environments with automatic resource allocation.
-
-    \item Implement variance reduction techniques (importance sampling and stratified sampling) in the Monte Carlo + MOCUS adaptive quantification to tighten convergence for event sequences with frequencies below $10^{-9}$.
 
     \item Develop priority based queueing systems using directed acyclic graph algorithms to automatically assign task priorities based on computational complexity and available computational resources of the nodes.
 
@@ -26,7 +22,7 @@ The following enhancements are planned for the distributed PRA quantification sy
 \section{Closing Remarks}
 This thesis has introduced a distributed computing framework for probabilistic risk assessment that addresses the computational limitations of traditional serial approaches. The literature review established the current landscape of PRA tools and identified critical gaps in distributed computing capabilities for nuclear risk analysis. Building upon distributed systems theory, the research presented a comprehensive architectural design that enables distributed processing of PRA quantification tasks.
 
-The implemented system integrates existing PRA solvers within a scalable distributed environment, incorporating fault tolerance mechanisms. Through the MHTGR case study, the framework illustrated the scalability of the overall architecture when handling real world event trees and fault trees. The evaluation revealed both the system’s capabilities and limitations, particularly in adaptive quantification techniques, which informed the proposed future directions for enhancement, including integration of variance reduction techniques for the Monte Carlo fallback.
+The implemented system integrates existing PRA solvers within a scalable distributed environment, incorporating fault tolerance mechanisms. Through the MHTGR case study, the framework illustrated the scalability of the overall architecture when handling real world event trees and fault trees. The evaluation revealed both the system’s capabilities and limitations, which informed the proposed future directions for enhancement.
 
-This work establishes a foundation for next generation PRA tools that can leverage distributed computing resources to handle increasingly complex risk models efficiently. The research contributions span theoretical framework development for adaptive quantification, practical system implementation with GPU accelerated Monte Carlo support, and code-to-code verification, providing a pathway toward more comprehensive and near real-time risk assessments in nuclear safety applications.
+This work establishes a foundation for next generation PRA tools that can leverage distributed computing resources to handle increasingly complex risk models efficiently. The research contributions span practical system implementation with GPU accelerated Monte Carlo support and code-to-code verification, providing a pathway toward more comprehensive and near real-time risk assessments in nuclear safety applications.
 
