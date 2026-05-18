@@ -255,21 +255,6 @@
 {\endtitlepage \pagestyle{plain}}
 
 %% -------------------------------------------------------------------------- %%
-%% Abstract page commands
-\newcommand{\makecopyrightpage}{
-    \begin{titlepage}
-    \centering
-      \quad
-      \vspace{0.35\textheight}
-
-      \copyright{} Copyright \ncsu@year{} by \@author \\[1em]
-      All Rights Reserved
-
-      \vfill
-    \end{titlepage}
-}
-
-%% -------------------------------------------------------------------------- %%
 %% Title page commands
 
 \newcommand{\ncsu@committeesize}{3}
