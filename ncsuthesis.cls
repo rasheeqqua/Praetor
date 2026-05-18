@@ -61,70 +61,6 @@
 \RequirePackage[margin=1in,
                 footskip=0.5in]{geometry}
 
-\newcommand{\makeauthorshipstatementpage}{%
-  \clearpage
-  \thispagestyle{plain} % Ensures page number appears at bottom like other front matter
-  
-  %% 1. Manually add to Table of Contents
-  \phantomsection 
-  \addcontentsline{toc}{chapter}{Authorship Statement}
-
-  %% 2. Manual Header (Matches Abstract size/style, but stays at 1-inch margin)
-  \begin{center}
-    \large \bfseries \MakeUppercase{Authorship Statement}
-  \end{center}
-
-  \vspace{1em} % Spacing between title and body text
-
-  \begin{doublespacing}
-    \noindent
-    Contributions of Hasibul Hossain Rasheeq and coauthors are listed below for each chapter:
-
-    \vspace{0.5em}
-
-    \noindent \textbf{Chapter 1} \\
-    1. Hasibul Hossain Rasheeq: sole author of Chapter 1.
-
-    \vspace{0.5em}
-
-    \noindent \textbf{Chapter 2} \\
-    1. Hasibul Hossain Rasheeq: primary author. \\
-    2. Asmaa Farag, Egemen Aras, and Arjun Earthperson: thesis manuscripts and conference papers of these authors guided the literature review.
-
-    \vspace{0.5em}
-
-    \noindent \textbf{Chapter 3} \\
-    1. Hasibul Hossain Rasheeq: sole author of Chapter 3.
-
-    \vspace{0.5em}
-
-    \noindent \textbf{Chapter 4} \\
-    1. Hasibul Hossain Rasheeq: primary author. \\
-    2. Arjun Earthperson: conceptualized the microservice based architecture.
-
-    \vspace{0.5em}
-
-    \noindent \textbf{Chapter 5} \\
-    1. Hasibul Hossain Rasheeq: primary author. \\
-    2. Arjun Earthperson: helped with the boilerplate setup and cluster based implementation. \\
-    3. Kirill Shumilov: provided insights on resource optimization for container based deployments.
-
-    \vspace{0.5em}
-
-    \noindent \textbf{Chapter 6} \\
-    1. Hasibul Hossain Rasheeq: primary author. \\
-    2. Kirill Shumilov: helped with the visualization of asynchronous distributed execution results.
-
-    \vspace{0.5em}
-
-    \noindent \textbf{Use of generative artificial intelligence:} \\
-    The author has utilized the Gemini 3 Pro model for editing purposes, including grammar checking, sentence structure refinement, and ensuring clarity of expression. The intellectual work, including but not only limited to design, implementation, analysis, and argumentation remains solely the product of the author.
-
-    \vfill
-  \end{doublespacing}
-  \clearpage
-}
-
 %% -------------------------------------------------------------------------- %%
 %% Disposition format -- any titles, headings, section titles
 \newcommand{\ncsu@dispositionformat}{}
@@ -269,32 +205,6 @@
     \renewcommand{\ncsu@cochairII}{#1}
     \renewcommand{\ncsu@chairtype}{cochair}
 }
-
-%% -------------------------------------------------------------------------- %%
-%% ------------ Dedication, biography, and acknowledgements ----------------- %%
-%% -------------------------------------------------------------------------- %%
-%%  Template
-\newcommand{\ncsu@dedbioack}[1]{%
-    \chapter*{#1}%
-}
-
-%%  Dedication
-\newcommand{\dedicationtitle}{Dedication}
-\newenvironment{dedication}
-{\ncsu@dedbioack{\dedicationtitle}}
-{\clearpage}
-
-%%  Biography
-\newcommand{\biographytitle}{Biography}
-\newenvironment{biography}
-{\ncsu@dedbioack{\biographytitle}}
-{\clearpage}
-
-%%  Acknowledgements
-\newcommand{\acknowledgementstitle}{Acknowledgements}
-\newenvironment{acknowledgements}
-{\ncsu@dedbioack{\acknowledgementstitle}}
-{\clearpage}
 
 %% -------------------------------------------------------------------------- %%
 %% -------------------------  Table of Contents ----------------------------- %%
