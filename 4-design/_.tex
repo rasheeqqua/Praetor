@@ -1,10 +1,32 @@
 \chapter{System Design}
 \label{chap:system-design}
 
+\section{Design Goals and Requirements}
+\label{sec:design-requirements-ds}
+
+The design of a distributed queueing system for PRA quantification must balance multiple competing objectives informed by both distributed systems theory and domain specific constraints.
+\begin{itemize}
+    \item \textbf{Reliability:} stands as the foremost requirement, ensuring the system continues operating correctly despite component failures and software errors. This necessitates redundant components, graceful degradation mechanisms, and comprehensive failure recovery procedures.
+
+    \item \textbf{Scalability:} must address both vertical growth through more powerful hardware and horizontal growth through additional nodes. The system should demonstrate reasonable performance improvements as resources increase, avoiding architectural bottlenecks that limit expansion. For PRA workloads, this means efficient utilization of resources across heterogeneous hardware such as CPUs and GPUs.
+
+    \item \textbf{Maintainability:} encompasses the ease with which engineers can understand, modify, and operate the system throughout its lifecycle. This requires clear modular boundaries, comprehensive documentation, standardized interfaces, and automated deployment processes. For nuclear applications where systems may remain in operation for decades, maintainability becomes particularly crucial.
+
+    \item \textbf{Interoperability:} represents a core requirement given the diverse ecosystem of PRA tools and formats. The system must provide adapters for both open and proprietary solvers, translate between different model representations, and present a unified interface to users regardless of the underlying calculation engine.
+
+    \item \textbf{Security:} implementations must enforce authentication, authorization, and auditing while accommodating the regulatory requirements of nuclear data. Role based access control, encrypted communication, and comprehensive audit trails become essential requirements.
+
+    \item \textbf{Performance:} objectives must address both throughput for batch processing and latency for interactive analysis. The system should maximize resource utilization while providing responsive feedback to users. For queueing systems, this involves efficient scheduling algorithms, work stealing between idle workers, and priority handling for time sensitive calculations.
+
+    \item \textbf{Operational simplicity:} ensures that the system can be deployed, monitored, and maintained by engineering teams without specialized distributed systems expertise. Comprehensive monitoring, meaningful metrics, and clear operational procedures are required for practical adoption in nuclear engineering organizations.
+
+    \item \textbf{Evolvability:} allows the system to incorporate new PRA solvers, analysis techniques, and hardware platforms without fundamental architectural changes. Versioned APIs, and backward compatibility mechanisms ensure the system can adapt to evolving requirements while preserving existing workflows and data.
+\end{itemize}
+
 \section{Design Philosophy}
 The distributed networked system is designed to address a long standing challenge in PRA: a fragmented software ecosystem. PRA studies often depend on many specialized quantification tools written in different languages (e.g., C++, Erlang) and distributed as standalone desktop applications. Rewriting these solvers into a single unified codebase is costly and time intensive. Instead, the guiding idea of this work is to wrap and orchestrate existing tools so they can be used together as scalable network services.
 
-To achieve this, the system combines three of the well established architectural patterns mentioned in ~chapter \ref{chap:distributed-systems}:
+To achieve this, the system combines three well established architectural patterns:
 
 \begin{itemize}
     \item \textbf{Microservices:} PRA solvers are packaged and operated as independent services that can be deployed and scaled.
