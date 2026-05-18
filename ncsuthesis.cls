@@ -185,12 +185,6 @@
     \author{\ncsu@authorfirstmiddle{} \ncsu@authorlast}
 }
 
-%% Degree year - in case the degree year doesn't match the current year.
-\newcommand{\ncsu@year}{\the\year}
-\providecommand{\degreeyear}[1]{
-    \renewcommand{\ncsu@year}{#1}
-}
-
 %% -------------------------------------------------------------------------- %%
 %% Thesis Title
 \newcommand{\ncsu@thesistitle}{My Thesis Title}
@@ -255,205 +249,25 @@
 {\endtitlepage \pagestyle{plain}}
 
 %% -------------------------------------------------------------------------- %%
-%% Title page commands
-
-\newcommand{\ncsu@committeesize}{3}
-\providecommand{\committeesize}[1]{\renewcommand{\ncsu@committeesize}{#1}}
-
-%% To allow for Chair vs Co-chairs:
+%% Chair / co-chair commands (used only by the abstract page header).
 \newcommand{\ncsu@chairtype}{}
 
-%% For each committee member, we have their name and title.
-%%  By default, their title is empty.  We use an optional argument
-%%  to set the title of committee members or to set the chair's
-%%  title to something other than `Chair of Advisory Committee'.
 \newcommand{\ncsu@chair}{Advisor Q. Chair}
-\newcommand{\ncsu@chairtitle}{Committee Chair}
-\providecommand{\chair}[2][]{
-    \renewcommand{\ncsu@chair}{#2}
-    % Checking if optional title argument is present.
-    \ifthenelse{\equal{#1}{}}{}{\renewcommand{\ncsu@chairtitle}{#1}}
-    % Declare that we have a chair:
+\providecommand{\chair}[1]{
+    \renewcommand{\ncsu@chair}{#1}
     \renewcommand{\ncsu@chairtype}{chair}
 }
 
 \newcommand{\ncsu@cochairI}{Co-chair 1 of Committee}
-\newcommand{\ncsu@cochairItitle}{Co-chair of Advisory Committee}
-\providecommand{\cochairI}[2][]{
-    \renewcommand{\ncsu@cochairI}{#2}
-    \ifthenelse{\equal{#1}{}}{}{\renewcommand{\ncsu@cochairItitle}{#1}}
-    % Declare that we have co-chairs.
+\providecommand{\cochairI}[1]{
+    \renewcommand{\ncsu@cochairI}{#1}
     \renewcommand{\ncsu@chairtype}{cochair}
 }
 
 \newcommand{\ncsu@cochairII}{Co-chair 2 of Committee}
-\newcommand{\ncsu@cochairIItitle}{Co-chair of Advisory Committee}
-\providecommand{\cochairII}[2][]{
-    \renewcommand{\ncsu@cochairII}{#2}
-    \ifthenelse{\equal{#1}{}}{}{\renewcommand{\ncsu@cochairIItitle}{#1}}
+\providecommand{\cochairII}[1]{
+    \renewcommand{\ncsu@cochairII}{#1}
     \renewcommand{\ncsu@chairtype}{cochair}
-}
-
-\newcommand{\ncsu@memberI}{Member 1 of Committee}
-\newcommand{\ncsu@memberItitle}{}
-\providecommand{\memberI}[2][]{
-    \renewcommand{\ncsu@memberI}{#2}
-    \ifthenelse{\equal{#1}{}}{}{\renewcommand{\ncsu@memberItitle}{#1}}
-}
-
-\newcommand{\ncsu@memberII}{Member 2 of Committee}
-\newcommand{\ncsu@memberIItitle}{}
-\providecommand{\memberII}[2][]{
-    \renewcommand{\ncsu@memberII}{#2}
-    \ifthenelse{\equal{#1}{}}{}{\renewcommand{\ncsu@memberIItitle}{#1}}
-}
-
-\newcommand{\ncsu@memberIII}{Member 3 of Committee}
-\newcommand{\ncsu@memberIIItitle}{}
-\providecommand{\memberIII}[2][]{
-    \renewcommand{\ncsu@memberIII}{#2}
-    \ifthenelse{\equal{#1}{}}{}{\renewcommand{\ncsu@memberIIItitle}{#1}}
-%Define Member IV (missing before)
-\newcommand{\ncsu@memberIV}{Member 4 of Committee}
-\newcommand{\ncsu@memberIVtitle}{}
-\providecommand{\memberIV}[2][]{
-\renewcommand{\ncsu@memberIV}{#2}
-\ifthenelse{\equal{#1}{}}{}{\renewcommand{\ncsu@memberIVtitle}{#1}}
-}
-}
-
-\newcommand{\ncsu@titlepageparagraph}{
- \ifthenelse{\equal{\ncsu@thesistype}{phd}}{
-   A thesis submitted to the Graduate Faculty of\\
-   North Carolina State University\\
-   in partial fulfillment of the\\
-   requirements for the degree of\\
-   Master of Science
- }{} % end ifthenels phd
- \ifthenelse{\equal{\ncsu@thesistype}{ms}}{
-   A thesis submitted to the Graduate Faculty of\\
-   North Carolina State University\\
-   in partial fulfillment of the\\
-   requirements for the Degree of\\
-   Master of Science
- }{}
-}
-
-\newcommand{\ncsu@program}{Degree Program}
-\providecommand{\program}[1]{\renewcommand{\ncsu@program}{#1}}
-
-\newcommand{\ncsu@citystate}{Raleigh, North Carolina}
-
-\newcommand{\ncsu@signatureline}[2][]{
-    \begin{minipage}[t]{0.4\textwidth}
-    \centering
-     \hrule
-     \vspace{0.5ex}
-     #2\\ #1
-    \end{minipage}
-}
-
-\newcommand{\ncsu@committeesignatures}{
-  \ifthenelse{\equal{\ncsu@chairtype}{chair}}{
-    \ifthenelse{\ncsu@committeesize=3}{
-      \begin{tabular}[t]{c@{\hspace{0.5in}}c}
-         \ncsu@signatureline[\ncsu@memberItitle]{\ncsu@memberI} &
-         \ncsu@signatureline[\ncsu@memberIItitle]{\ncsu@memberII} \\[6em]
-         \multicolumn{2}{c}{\ncsu@signatureline[\ncsu@chairtitle]{\ncsu@chair}}
-      \end{tabular}
-    }{} % end ifthenelse = 3
-    \ifthenelse{\ncsu@committeesize=4}{
-      \begin{tabular}[t]{c@{\hspace{0.5in}}c}
-         \ncsu@signatureline[\ncsu@memberItitle]{\ncsu@memberI} &
-         \ncsu@signatureline[\ncsu@memberIItitle]{\ncsu@memberII} \\[6em]
-         \ncsu@signatureline[\ncsu@memberIIItitle]{\ncsu@memberIII} &
-         \ncsu@signatureline[\ncsu@chairtitle]{\ncsu@chair} \\
-      \end{tabular}
-    }{} % end ifthenelse = 4
-    \ifthenelse{\ncsu@committeesize=5}{
-      \begin{tabular}[t]{c@{\hspace{0.5in}}c}
-         \ncsu@signatureline[\ncsu@memberItitle]{\ncsu@memberI} &
-         \ncsu@signatureline[\ncsu@memberIItitle]{\ncsu@memberII} \\[5em]
-         \ncsu@signatureline[\ncsu@memberIIItitle]{\ncsu@memberIII} &
-         \ncsu@signatureline[\ncsu@memberIVtitle]{\ncsu@memberIV} \\[5em]
-         \multicolumn{2}{c}{\ncsu@signatureline[\ncsu@chairtitle]{\ncsu@chair}}
-      \end{tabular}
-    }{} % end ifthenelse = 5
-    \ifthenelse{\ncsu@committeesize=6}{
-      \begin{tabular}[t]{c@{\hspace{0.5in}}c}
-         \ncsu@signatureline[\ncsu@memberItitle]{\ncsu@memberI} &
-         \ncsu@signatureline[\ncsu@memberIItitle]{\ncsu@memberII} \\[5em]
-         \ncsu@signatureline[\ncsu@memberIIItitle]{\ncsu@memberIII} &
-         \ncsu@signatureline[\ncsu@memberIVtitle]{\ncsu@memberIV} \\[5em]
-         \ncsu@signatureline[\ncsu@memberVtitle]{\ncsu@memberV} &
-         \ncsu@signatureline[\ncsu@chairtitle]{\ncsu@chair} \\
-      \end{tabular}
-    }{} % end ifthenelse = 6
-  }{} % end ifthenelse type = chair
-  \ifthenelse{\equal{\ncsu@chairtype}{cochair}}{
-    % co-chairs; if number is odd, put co-chairs on top line.
-    \ifthenelse{\ncsu@committeesize=3}{
-      \begin{tabular}[t]{c@{\hspace{0.5in}}c}
-         \ncsu@signatureline[\ncsu@cochairItitle]{\ncsu@cochairI} &
-         \ncsu@signatureline[\ncsu@cochairIItitle]{\ncsu@cochairII} \\[6em]
-         \multicolumn{2}{c}%
-           {\ncsu@signatureline[\ncsu@memberItitle]{\ncsu@memberI}}
-      \end{tabular}
-    }{} % end ifthenelse = 3
-    \ifthenelse{\ncsu@committeesize=4}{
-      \begin{tabular}[t]{c@{\hspace{0.5in}}c}
-         \ncsu@signatureline[\ncsu@memberItitle]{\ncsu@memberI} &
-         \ncsu@signatureline[\ncsu@memberIItitle]{\ncsu@memberII} \\[6em]
-         \ncsu@signatureline[\ncsu@cochairItitle]{\ncsu@cochairI} &
-         \ncsu@signatureline[\ncsu@cochairIItitle]{\ncsu@cochairII}
-      \end{tabular}
-    }{} % end ifthenelse = 4
-    \ifthenelse{\ncsu@committeesize=5}{
-      \begin{tabular}[t]{c@{\hspace{0.5in}}c}
-         \ncsu@signatureline[\ncsu@cochairItitle]{\ncsu@cochairI} &
-         \ncsu@signatureline[\ncsu@cochairIItitle]{\ncsu@cochairII} \\[5em]
-         \ncsu@signatureline[\ncsu@memberItitle]{\ncsu@memberI} &
-         \ncsu@signatureline[\ncsu@memberIItitle]{\ncsu@memberII} \\[5em]
-         \multicolumn{2}{c}%
-           {\ncsu@signatureline[\ncsu@memberIIItitle]{\ncsu@memberIII}}
-      \end{tabular}
-    }{} % end ifthenelse = 5
-    \ifthenelse{\ncsu@committeesize=6}{
-      \begin{tabular}[t]{c@{\hspace{0.5in}}c}
-         \ncsu@signatureline[\ncsu@memberItitle]{\ncsu@memberI} &
-         \ncsu@signatureline[\ncsu@memberIItitle]{\ncsu@memberII} \\[5em]
-         \ncsu@signatureline[\ncsu@memberIIItitle]{\ncsu@memberIII} &
-         \ncsu@signatureline[\ncsu@memberIVtitle]{\ncsu@memberIV} \\[5em]
-         \ncsu@signatureline[\ncsu@cochairItitle]{\ncsu@cochairI} &
-         \ncsu@signatureline[\ncsu@cochairIItitle]{\ncsu@cochairII} \\
-      \end{tabular}
-    }{} % end ifthenelse = 6
-  }{} % end ifthenelse type = cochair
-}
-
-\newcommand{\maketitlepage}{
-     \thispagestyle{empty}
-     \clearpage
-     \singlespacing
-      \begin{center}
-            \vfill
-        \ncsu@thesistitle
-            \vfill
-        by \\
-        \@author
-            \vfill
-       \ncsu@titlepageparagraph
-           \vfill
-       \ncsu@program\\[4\ncsu@lineheight]
-       \ncsu@citystate\\[0\ncsu@lineheight]
-       \ncsu@year
-           \vfill
-       APPROVED BY:
-           \vfill
-       \ncsu@committeesignatures
-      \end{center}
-     \clearpage
-     \ncsu@defaultspacing
 }
 
 %% -------------------------------------------------------------------------- %%
